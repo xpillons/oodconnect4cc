@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    
+    <form method="post">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <h1 class="mt-5">{% block title %} Add a New Cluster {% endblock %}</h1>
+                        <h2 class="mt-5"> CycleCloud Cluster information</h1>
+                    </div>
+                    <div class="form-group">
+                        <label>Cluster Name</label>
+                        <input name="cluster_name" type="text" class="form-control required" value="{{ request.form['cluster_name'] }}">
+                        <label>Home directory mount adress - default cyclecloud = Scheduler IP</label>
+                        <input name="Home_mount_IP" type="text" class="form-control required" value="{{ request.form['Home_mount_IP'] }}">
+                        <label>Home directory mount export - default cyclecloud = /shared/home</label>
+                        <input name="Home_mount_export" type="text" place class="form-control required" value="{{ request.form['Home_mount_export'] }}">
+                        <label>Login node adress - Can be the Scheduler</label>
+                        <input name="Login_ip" type="text" class="form-control required" value="{{ request.form['Login_ip'] }}">
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+    </form>
+    <style>
+        .required:after {
+          content:" *";
+          color: red;
+        }
+      </style>
+    
+{% endblock %}

@@ -1,0 +1,61 @@
+# This Ansible playbook adds a cluster for Open OnDemand (OOD).
+
+- name: Cluster config
+  hosts: 127.0.0.1
+  connection: local
+  vars_files: vars.yml
+  tasks:
+
+    # Create the directory for cluster configuration files
+    - name: Create cluster dir
+      become: true
+      ansible.builtin.file:
+        path: /etc/ood/config/clusters.d
+        state: directory
+
+    # Copy wrapper scripts to the target directory
+    - name: Copy wrapper scripts
+      become: true
+      ansible.builtin.copy:
+        src: ../bin/
+        dest: /usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/
+        mode: '0755'
+
+    # Find all wrapper script files in the target directory
+    - name: Find all script vars_files
+      ansible.builtin.find:
+        paths: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/"
+        patterns: "*_wrapper.sh"
+      register: scripts
+
+    # Replace placeholder IP with the actual login IP in the wrapper scripts
+    - name: Replace IP with login IP
+      become: true
+      ansible.builtin.replace:
+        path: "{{ item.path }}"
+        regexp: 'LOGIN_IP'
+        replace: "{{ Login_ip }}"
+      with_items: "{{ scripts.files }}"
+
+    # Write the cluster configuration file
+    # bin_overrides are used to ensure that slurm, munge do not need installing on the OOD node.
+    # These scripts are based on  https://github.com/puneet336/OOD-1.5_wrappers/tree/42011d75963986aca5e9e34173e2ae565358f6a6/openondemand/1.5/wrappers/slurm/bin
+    - name: Write clusterfile
+      become: true
+      ansible.builtin.copy:
+        dest: /etc/ood/config/clusters.d/{{ escaped_cluster_name }}.yml
+        content: |
+          ---
+          v2:
+            metadata:
+              title: "{{ cluster_name }}"
+            login:
+              host: "{{ Login_ip }}"
+            job:
+              adapter: "slurm"
+              bin: "/usr/bin"
+              bin_overrides:
+                sbatch: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/sbatch_wrapper.sh"
+                squeue: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/squeue_wrapper.sh"
+                scontrol: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/scontrol_wrapper.sh"
+                scancel: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/scancel_wrapper.sh"
