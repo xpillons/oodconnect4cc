@@ -2,6 +2,8 @@
 echo "$@"
 PATH=$PATH:/usr/local/bin
 
+export ANSIBLE_VERBOSITY=2
+
 if [ "$1" == "Home" ]; then
     ansible-playbook Ansible/homedir.yml
     exit_code=$?
