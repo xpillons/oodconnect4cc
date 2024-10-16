@@ -16,7 +16,7 @@
       become: true
       ansible.posix.mount:
         src: "{{ Home_mount_IP }}:{{ Home_mount_export }}"
-        path: /shared/home
+        path: /shared
         state: mounted
         opts: "nofail"
         fstype: nfs
@@ -25,7 +25,7 @@
     - name: Check if CycleCloud home dir exists
       become: true
       ansible.builtin.stat:
-        path: /shared/home/cyclecloud
+        path: /shared/cyclecloud
       register: dircheck
 
     # Copy the CycleCloud home directory if it does not exist
@@ -33,7 +33,7 @@
       become: true
       ansible.builtin.copy:
         src: /home/cyclecloud
-        dest: /shared/home/
+        dest: /shared/
         remote_src: true
         owner: cyclecloud
         group: cyclecloud
