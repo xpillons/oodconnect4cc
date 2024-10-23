@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
 import subprocess, yaml, re, socket, json
-MyApp = Flask(__name__)
+MyApp = Flask('oodconnector')
 MyApp.config['SECRET_KEY'] = '4b27e55d915941e3ef6b22ea588e3d27df0684d0797fffe9'
 
 @MyApp.route("/",methods=('GET', 'POST'))
