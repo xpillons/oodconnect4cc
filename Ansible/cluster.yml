@@ -73,3 +73,32 @@
               #     export PATH="/opt/TurboVNC/bin:$PATH"
               #     export WEBSOCKIFY_CMD="/usr/bin/websockify"
               #     %s
+
+    # Write the login node configuration file
+    - name: Write login node cluster definition
+      become: true
+      ansible.builtin.copy:
+        dest: /etc/ood/config/clusters.d/login_{{ escaped_cluster_name }}.yml
+        content: |
+          ---
+          v2:
+            metadata:
+              title: "login_{{ cluster_name }}"
+            login:
+              host: "{{ Login_ip }}"
+            job:
+              adapter: "systemd"
+              submit_host: "{{ Login_ip }}"
+              ssh_host:
+                - {{ Login_ip }}
+              site_timeout: 7200
+              strict_host_checking: false
+              debug: true
+
+            # Don't show ssh link in batch connect card
+            batch_connect:
+              ssh_allow: false
+              basic:
+                script_wrapper: |
+                  module purge
+                  %s
