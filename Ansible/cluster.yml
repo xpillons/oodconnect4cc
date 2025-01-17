@@ -84,14 +84,12 @@
           v2:
             metadata:
               title: "login_{{ cluster_name }}"
-            login:
-              host: "{{ Login_ip }}"
             job:
               adapter: "systemd"
               submit_host: "{{ Login_ip }}"
               ssh_host:
                 - {{ Login_ip }}
-              site_timeout: 7200
+              #site_timeout: 7200
               strict_host_checking: false
               debug: true
 
