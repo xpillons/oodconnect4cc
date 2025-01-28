@@ -4,7 +4,7 @@
 SERVER_IP=LOGIN_IP
 
 ssh_options="-o StrictHostKeyChecking=no -o LogLevel=quiet -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"
-ssh $SERVER_IP $ssh_options "scontrol $@"
+ssh $SERVER_IP $ssh_options "sacctmgr $@"
 EXIT_CODE=$(echo $?)
 
 exit $EXIT_CODE

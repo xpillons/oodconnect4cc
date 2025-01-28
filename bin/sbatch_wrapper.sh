@@ -4,7 +4,7 @@
 SERVER_IP=LOGIN_IP
 
 # Execute the sbatch command on the server with the actual home directory as the working directory
-ssh_options="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"
+ssh_options="-o StrictHostKeyChecking=no -o LogLevel=quiet -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"
 ssh $SERVER_IP $ssh_options "sbatch $@"
 # Exit the script with the captured exit code
 EXIT_CODE=$(echo $?)

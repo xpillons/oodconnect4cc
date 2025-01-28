@@ -3,7 +3,7 @@
 # This is replaced by Ansible
 SERVER_IP=LOGIN_IP
 
-ssh_options="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"
+ssh_options="-o StrictHostKeyChecking=no -o LogLevel=quiet -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"
 ssh $SERVER_IP $ssh_options "squeue $@"
 EXIT_CODE=$(echo $?)
 
