@@ -45,9 +45,6 @@ def index():
                 # Dump out the variables to a an Ansbile Vars file
                 with open('Ansible/vars.yml', 'w') as outfile:
                     yaml.dump(clusterData, outfile)
-                # status_home = Config_script("Home") # Configure home directories
-                # if status_home != 0:
-                #     return redirect(url_for('index'))
                 
                 status_cluster = Config_script("Cluster") # Configure cluster
                 if status_cluster != 0:
@@ -102,11 +99,6 @@ def get_form_data():
               characters replaced by hyphens and converted to lowercase.
     """
     # Retrieves the form from HTML and creates a dictionary of values the returns this dict.
-    # clusterData={"cluster_name": request.form['cluster_name'],
-    #                 "Login_ip" : request.form['Login_ip'] ,
-    #                 "Home_mount_IP" : request.form['Home_mount_IP'] ,
-    #                 "Home_mount_export" : request.form['Home_mount_export'],
-    #                 }
     clusterData={"cluster_name": request.form['cluster_name'],
                     "Login_ip" : request.form['Login_ip'] ,
                     }    # taken from CycleCloud Slurm, used so names are in the same format as CC

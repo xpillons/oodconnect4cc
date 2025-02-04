@@ -1,4 +1,4 @@
-# This Ansible playbook adds a cluster for Open OnDemand (OOD).
+# This Ansible playbook adds a Slurm cluster for Open OnDemand (OOD) using a login node as a proxy for Slurm commands.
 
 - name: Cluster config
   hosts: 127.0.0.1
@@ -17,87 +17,27 @@
     - name: Copy wrapper scripts
       become: true
       ansible.builtin.copy:
-        src: ../bin/
+        src: wrappers/
         dest: /usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/
         mode: '0755'
-
-    # Find all wrapper script files in the target directory
-    - name: Find all script vars_files
-      ansible.builtin.find:
-        paths: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/"
-        patterns: "*_wrapper.sh"
-      register: scripts
-
-    # Replace placeholder IP with the actual login IP in the wrapper scripts
-    - name: Replace IP with login IP
+  
+    - name: Copy main slurm wrapper scripts to the target directory
       become: true
-      ansible.builtin.replace:
-        path: "{{ item.path }}"
-        regexp: 'LOGIN_IP'
-        replace: "{{ Login_ip }}"
-      with_items: "{{ scripts.files }}"
+      template:
+        src: 'slurm_proxy.j2'
+        dest: '/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/slurm_proxy.sh'
+        mode: '0755'
 
     # Write the cluster configuration file
-    # bin_overrides are used to ensure that slurm, munge do not need installing on the OOD node.
-    # These scripts are based on  https://github.com/puneet336/OOD-1.5_wrappers/tree/42011d75963986aca5e9e34173e2ae565358f6a6/openondemand/1.5/wrappers/slurm/bin
     - name: Write clusterfile
       become: true
-      ansible.builtin.copy:
-        dest: /etc/ood/config/clusters.d/{{ escaped_cluster_name }}.yml
-        content: |
-          ---
-          v2:
-            metadata:
-              title: "{{ cluster_name }}"
-            login:
-              host: "{{ Login_ip }}"
-            job:
-              adapter: "slurm"
-              #bin: "/usr/bin"
-              bin_overrides:
-                sbatch: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/sbatch_wrapper.sh"
-                squeue: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/squeue_wrapper.sh"
-                scontrol: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/scontrol_wrapper.sh"
-                scancel: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/scancel_wrapper.sh"
-                sinfo: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/sinfo_wrapper.sh"
-                sacctmgr: "/usr/local/bin/{{ escaped_cluster_name }}_wrapper_scripts/sacctmgr_wrapper.sh"
-            # Don't show ssh link in batch connect card
-            batch_connect:
-              ssh_allow: false
-              basic:
-                script_wrapper: |
-                  module purge
-                  %s
-              # vnc:
-              #   script_wrapper: |
-              #     module purge
-              #     export PATH="/opt/TurboVNC/bin:$PATH"
-              #     export WEBSOCKIFY_CMD="/usr/bin/websockify"
-              #     %s
+      template:
+        src: 'slurm_cluster_definition.j2'
+        dest: '/etc/ood/config/clusters.d/{{ escaped_cluster_name }}.yml'
 
     # Write the login node configuration file
     - name: Write login node cluster definition
       become: true
-      ansible.builtin.copy:
-        dest: /etc/ood/config/clusters.d/login_{{ escaped_cluster_name }}.yml
-        content: |
-          ---
-          v2:
-            metadata:
-              title: "login_{{ cluster_name }}"
-            job:
-              adapter: "systemd"
-              submit_host: "{{ Login_ip }}"
-              ssh_host:
-                - {{ Login_ip }}
-              #site_timeout: 7200
-              strict_host_checking: false
-              debug: true
-
-            # Don't show ssh link in batch connect card
-            batch_connect:
-              ssh_allow: false
-              basic:
-                script_wrapper: |
-                  module purge
-                  %s
+      template:
+        src: 'login_cluster_definition.j2'
+        dest: '/etc/ood/config/clusters.d/login_{{ escaped_cluster_name }}.yml'
