@@ -41,3 +41,12 @@
       template:
         src: 'login_cluster_definition.j2'
         dest: '/etc/ood/config/clusters.d/login_{{ escaped_cluster_name }}.yml'
+
+    # set the /etc/ood/config/announcement.yml file to be dismisable
+    - name: Set announcement file to be dismisable
+      become: true
+      lineinfile:
+          state: present
+          dest: /etc/ood/config/announcement.yml
+          regexp: "^dismissible"
+          line: 'dismissible: false'
