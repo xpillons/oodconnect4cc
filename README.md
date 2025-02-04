@@ -41,6 +41,8 @@ To accommodate multi-cluster environments, connections to the SLURM clusters are
 - `SCANCEL`
 - `SCONTROL`
 - `SQUEUE`
+- `SINFO`
+- `SACCTMGR`
 
 Wrapper scripts are per cluster and can be customized once copied into their respective folder: `/usr/local/bin/{{ cluster_name }}_wrapper_scripts/`. Wrapper scripts can contain any valid shell commands that will be run before SSH to the login node and running `SBATCH`.
 
