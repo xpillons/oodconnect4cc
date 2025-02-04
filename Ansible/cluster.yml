@@ -46,7 +46,7 @@
     - name: Set announcement file to be dismisable
       become: true
       lineinfile:
-          state: present
-          dest: /etc/ood/config/announcement.yml
-          regexp: "^dismissible"
-          line: 'dismissible: true'
+        state: present
+        dest: /etc/ood/config/announcement.yml
+        regexp: "^dismissible"
+        line: 'dismissible: true'
